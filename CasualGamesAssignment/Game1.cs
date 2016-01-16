@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CasualGamesAssignment.GameObjects.Base;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace CasualGamesAssignment
 {
@@ -16,10 +18,13 @@ namespace CasualGamesAssignment
 
         GameObjects.PlayerShip player;
 
+        List<GameObjects.Base.SimpleSprite> Missiles;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            Missiles = new List<GameObjects.Base.SimpleSprite>();
         }
 
         /// <summary>
@@ -32,6 +37,7 @@ namespace CasualGamesAssignment
         {
             // TODO: Add your initialization logic here
             input = new InputEngine(this);
+            Helper.Initialize(graphics,Missiles);
             base.Initialize();
         }
 
@@ -43,8 +49,11 @@ namespace CasualGamesAssignment
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             Texture2D playerSprite = Content.Load<Texture2D>("arrow");
-            player = new GameObjects.PlayerShip(playerSprite, new Vector2(200, 200)) { MaxSpeed = 5f, Acceleration = 0.1f, RotateSpeed = 0.05f, Friction = 0.01f, MaxPower = 0.4f };
+            Texture2D missileSprite = Content.Load<Texture2D>("miniArrow");
             debugFont = Content.Load<SpriteFont>("debug");
+
+            player = new GameObjects.PlayerShip(playerSprite, new Vector2(200, 200)) { MaxSpeed = 5f, Acceleration = 0.1f, RotateSpeed = 0.05f, Friction = 0.01f, MaxPower = 0.4f, FireDelay=200, MissileImage=missileSprite };
+            
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
@@ -68,6 +77,10 @@ namespace CasualGamesAssignment
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            foreach (SimpleSprite obj in Missiles)
+            {
+                obj.Update(gameTime);
+            }
             player.Update(gameTime);
             // TODO: Add your update logic here
             input.Update(gameTime);
@@ -84,9 +97,10 @@ namespace CasualGamesAssignment
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-            player.draw(spriteBatch);
+            player.draw(spriteBatch,debugFont);
             spriteBatch.DrawString(debugFont, InputEngine.CurrentPadState.ThumbSticks.Left.X.ToString(), new Vector2(10, 10), Color.White);
             spriteBatch.DrawString(debugFont, player.delta.ToString(), new Vector2(10, 30), Color.Green);
+            spriteBatch.DrawString(debugFont, Missiles.Count.ToString(), new Vector2(10, 50), Color.Black);
             spriteBatch.End();
             base.Draw(gameTime);
         }

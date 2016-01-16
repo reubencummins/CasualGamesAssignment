@@ -24,15 +24,19 @@ namespace CasualGamesAssignment.GameObjects.Base
 
         }
 
-        public virtual void draw(SpriteBatch sp)
+        public virtual void draw(SpriteBatch sp, SpriteFont font)
         {
             if (Visible)
                 sp.Draw(Image,Position,null,null, (Vector2.Zero + new Vector2(Image.Width / 2, Image.Height / 2)), Rotation,Vector2.One,Color.White,SpriteEffects.None,0);
         }
 
+        public virtual void Update(GameTime gameTime)
+        { }
+
         public void Move(Vector2 delta)
         {
             Position += delta;
+            Position = Helper.ScreenWrap(Position);
             BoundingRect = new Rectangle((int)Position.X, (int)Position.Y, Image.Width, Image.Height);
             BoundingRect.X = (int)Position.X;
             BoundingRect.Y = (int)Position.Y;
