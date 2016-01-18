@@ -18,6 +18,7 @@ namespace CasualGamesAssignment.GameObjects
         public float MaxSpeed { get; set; }
         public float MaxPower { get; set; }
         public float Friction { get; set; }
+        public PlayerShip Target { get; set; }
 
         public OpponentShip(Texture2D spriteImage, Vector2 startPosition):base(spriteImage,startPosition)
         {
@@ -27,12 +28,6 @@ namespace CasualGamesAssignment.GameObjects
 
         public override void Update(GameTime gameTime)
         {
-            Rotation += InputEngine.CurrentPadState.ThumbSticks.Left.X * RotateSpeed;
-
-            if (InputEngine.IsKeyHeld(Microsoft.Xna.Framework.Input.Keys.Left))
-                Rotation -= RotateSpeed;
-            if (InputEngine.IsKeyHeld(Microsoft.Xna.Framework.Input.Keys.Right))
-                Rotation += RotateSpeed;
 
             if (InputEngine.CurrentPadState.IsButtonDown(Microsoft.Xna.Framework.Input.Buttons.A) || InputEngine.IsKeyHeld(Microsoft.Xna.Framework.Input.Keys.Up))
             {
@@ -44,9 +39,13 @@ namespace CasualGamesAssignment.GameObjects
             else enginePower = 0;
 
 
-            var rotate = Matrix.CreateRotationZ(Rotation);
+            Vector2 LookVector = -(Position - Target.Position);
+            var rotate = Matrix.CreateRotationZ((float)Math.Atan2(LookVector.X, LookVector.Y));
+            Rotation = rotate.Rotation.Z;
+
             force = Vector2.Transform(new Vector2(0, -1), rotate);
             force *= enginePower;
+
 
             var currentSpeed = delta.Length();
             if (currentSpeed > MaxSpeed)
@@ -63,7 +62,7 @@ namespace CasualGamesAssignment.GameObjects
 
             delta += force;
 
-            Move(delta);
+            //Move(delta);
 
             base.Update(gameTime);
         }

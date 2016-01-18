@@ -13,18 +13,26 @@ namespace CasualGamesAssignment.GameObjects
         Vector2 Delta;
         float LifeTime = 200;
         float age = 0;
-        public Missile(Texture2D spriteImage, Vector2 startPostition,Vector2 delta):base(spriteImage,startPostition)
+
+
+        public float Speed { get; set; }
+
+        public Missile(Texture2D spriteImage, Vector2 startPostition,float angle):base(spriteImage,startPostition)
         {
-            Delta = delta;
+            Speed = 5;
+            var rotMatrix = Matrix.CreateRotationZ(angle);
+            Delta = new Vector2(0, -1);
+            Delta = Vector2.Transform(Delta, rotMatrix);
         }
 
         public override void Update(GameTime gameTime)
         {
-            Move(Delta);
-            age += gameTime.ElapsedGameTime.Milliseconds;
+            Delta += new Vector2((float)Math.Sin(age));
+            Move(Delta*Speed);
+            age ++;
             if (age>=LifeTime)
             {
-
+                Helper.RemoveObject(this);
             }
             base.Update(gameTime);
         }

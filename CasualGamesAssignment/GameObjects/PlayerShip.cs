@@ -32,11 +32,13 @@ namespace CasualGamesAssignment.GameObjects
 
         public override void Update(GameTime gameTime)
         {
+            Position = Helper.ScreenWrap(Position);
+
             if (InputEngine.CurrentKeyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Space) || InputEngine.CurrentPadState.IsButtonDown(Microsoft.Xna.Framework.Input.Buttons.X))
             {
                 if (canFire)
                 {
-                    Helper.AddObject(new Missile(MissileImage, Position, delta));
+                    Helper.AddObject(new Missile(MissileImage, Position, Rotation) { Speed=0.1f,LayerDepth=0f });
                     canFire = false;
                     fireTimer =0;
                 }
@@ -90,7 +92,6 @@ namespace CasualGamesAssignment.GameObjects
         public override void draw(SpriteBatch sp, SpriteFont font)
         {
             base.draw(sp, font);
-            sp.DrawString(font, delta.ToString(), Position, Color.CadetBlue);
         }
     }
 }
