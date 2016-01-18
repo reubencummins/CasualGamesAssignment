@@ -32,9 +32,16 @@ namespace CasualGamesAssignment.GameObjects
             age ++;
             if (age>=LifeTime)
             {
-                Helper.RemoveObject(this);
+                Die();
             }
+
+
             base.Update(gameTime);
+        }
+
+        public void Die()
+        {
+            Helper.RemoveObject(this);
         }
     }
 }

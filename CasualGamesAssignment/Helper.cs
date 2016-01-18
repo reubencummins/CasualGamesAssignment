@@ -14,10 +14,23 @@ namespace CasualGamesAssignment
         private static Vector2 viewportSize;
         private static List<SimpleSprite> objectPool;
 
+        private static Vector2 line = new Vector2(10, -10);
+
+        public static Vector2 NextLine()
+        {
+            line.Y += 20;
+            return line;
+        }
+
         public static void Initialize(GraphicsDeviceManager graphics, List<SimpleSprite> ObjectPool)
         {
             viewportSize = new Vector2(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height);
             objectPool = ObjectPool;
+        }
+
+        public static void Update()
+        {
+            line = new Vector2(10, 10);
         }
 
         public static Vector2 ScreenWrap(Vector2 position)

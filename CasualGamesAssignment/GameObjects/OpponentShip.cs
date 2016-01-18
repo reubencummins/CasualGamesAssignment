@@ -39,13 +39,10 @@ namespace CasualGamesAssignment.GameObjects
             else enginePower = 0;
 
 
-            Vector2 LookVector = -(Position - Target.Position);
-            var rotate = Matrix.CreateRotationZ((float)Math.Atan2(LookVector.X, LookVector.Y));
-            Rotation = rotate.Rotation.Z;
+            delta = (Target.Position - Position);
+            delta.Normalize();
 
-            force = Vector2.Transform(new Vector2(0, -1), rotate);
-            force *= enginePower;
-
+            Rotation = (float)(Math.Atan2(delta.Y, delta.X));
 
             var currentSpeed = delta.Length();
             if (currentSpeed > MaxSpeed)
@@ -57,7 +54,6 @@ namespace CasualGamesAssignment.GameObjects
                 currentSpeed -= Friction;
             }
             else currentSpeed = 0;
-            delta.Normalize();
             delta *= currentSpeed;
 
             delta += force;

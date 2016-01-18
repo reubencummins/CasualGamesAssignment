@@ -15,13 +15,8 @@ namespace CasualGamesAssignment.GameObjects
         private bool canFire;
         private float fireTimer;
 
-        public float Acceleration { get; set; }
-        public float RotateSpeed { get; set; }
-        public float MaxSpeed { get; set; }
-        public float MaxPower { get; set; }
-        public float Friction { get; set; }
-        public Texture2D MissileImage { get; set; }
-        public float FireDelay { get; set; }
+        public ShipInfo Info { get; set; }
+        
 
         public PlayerShip(Texture2D spriteImage,Vector2 startPosition):base(spriteImage,startPosition)
         {
@@ -38,29 +33,29 @@ namespace CasualGamesAssignment.GameObjects
             {
                 if (canFire)
                 {
-                    Helper.AddObject(new Missile(MissileImage, Position, Rotation) { Speed=0.1f,LayerDepth=0f });
+                    Helper.AddObject(new Missile(Info.MissileImage, Position, Rotation) { Speed=0.1f,LayerDepth=0f });
                     canFire = false;
                     fireTimer =0;
                 }
                 else fireTimer += gameTime.ElapsedGameTime.Milliseconds;
             }
 
-            if (fireTimer >= FireDelay)
+            if (fireTimer >= Info.FireDelay)
                 canFire = true;
 
 
-            Rotation += InputEngine.CurrentPadState.ThumbSticks.Left.X * RotateSpeed;
+            Rotation += InputEngine.CurrentPadState.ThumbSticks.Left.X * Info.RotateSpeed;
 
             if (InputEngine.IsKeyHeld(Microsoft.Xna.Framework.Input.Keys.Left))
-                Rotation -= RotateSpeed;
+                Rotation -= Info.RotateSpeed;
             if (InputEngine.IsKeyHeld(Microsoft.Xna.Framework.Input.Keys.Right))
-                Rotation += RotateSpeed;
+                Rotation += Info.RotateSpeed;
 
             if (InputEngine.CurrentPadState.IsButtonDown(Microsoft.Xna.Framework.Input.Buttons.A) || InputEngine.IsKeyHeld(Microsoft.Xna.Framework.Input.Keys.Up))
             {
-                if (enginePower <= MaxPower)
+                if (enginePower <= Info.MaxPower)
                 {
-                    enginePower += Acceleration;
+                    enginePower += Info.Acceleration;
                 }
             }
             else enginePower = 0;
@@ -71,13 +66,13 @@ namespace CasualGamesAssignment.GameObjects
             force *= enginePower;
 
             var currentSpeed = delta.Length();
-            if (currentSpeed > MaxSpeed)
+            if (currentSpeed > Info.MaxSpeed)
             {
-                currentSpeed = MaxSpeed;
+                currentSpeed = Info.MaxSpeed;
             }
             if (currentSpeed > 0)
             {
-                currentSpeed -= Friction;
+                currentSpeed -= Info.Friction;
             }
             else currentSpeed = 0;
             delta.Normalize();
@@ -91,6 +86,8 @@ namespace CasualGamesAssignment.GameObjects
 
         public override void draw(SpriteBatch sp, SpriteFont font)
         {
+            sp.DrawString(font, "Player Position: " + Position.ToString(), Helper.NextLine(), Color.White);
+            sp.DrawString(font, "Player Rotation: " + Rotation.ToString(), Helper.NextLine(), Color.White);
             base.draw(sp, font);
         }
     }

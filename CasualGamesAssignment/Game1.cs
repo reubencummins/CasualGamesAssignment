@@ -27,6 +27,10 @@ namespace CasualGamesAssignment
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             Missiles = new List<GameObjects.Base.SimpleSprite>();
+
+            graphics.PreferredBackBufferWidth = 1440;
+            graphics.PreferredBackBufferHeight = 900;
+            graphics.ToggleFullScreen();
         }
 
         /// <summary>
@@ -50,21 +54,24 @@ namespace CasualGamesAssignment
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            Texture2D playerSprite = Content.Load<Texture2D>("arrow");
+            Texture2D playerSprite = Content.Load<Texture2D>("blueship1");
             Texture2D missileSprite = Content.Load<Texture2D>("missile");
             debugFont = Content.Load<SpriteFont>("debug");
 
             player = new GameObjects.PlayerShip(playerSprite, new Vector2(200, 200))
             {
-                MaxSpeed = 5f,
-                Acceleration = 0.1f,
-                RotateSpeed = 0.05f,
-                Friction = 0.01f,
-                MaxPower = 0.4f,
-                FireDelay = 500,
-                MissileImage = missileSprite,
-                LayerDepth = 0.1f
+                Info = new ShipInfo()
+                {
+                    MaxSpeed = 5f,
+                    Acceleration = 0.1f,
+                    RotateSpeed = 0.05f,
+                    Friction = 0.01f,
+                    MaxPower = 0.4f,
+                    FireDelay = 500,
+                    MissileImage = missileSprite
+                }
             };
+            
 
             opponent = new OpponentShip(playerSprite, new Vector2(500, 200))
             {
@@ -103,6 +110,7 @@ namespace CasualGamesAssignment
             opponent.Update(gameTime);
             // TODO: Add your update logic here
             input.Update(gameTime);
+            Helper.Update();
             base.Update(gameTime);
         }
 
@@ -122,9 +130,6 @@ namespace CasualGamesAssignment
             {
                 m.draw(spriteBatch,debugFont);
             }
-            spriteBatch.DrawString(debugFont, InputEngine.CurrentPadState.ThumbSticks.Left.X.ToString(), new Vector2(10, 10), Color.White);
-            spriteBatch.DrawString(debugFont, player.delta.ToString(), new Vector2(10, 30), Color.Green);
-            spriteBatch.DrawString(debugFont, Missiles.Count.ToString(), new Vector2(10, 50), Color.Black);
             spriteBatch.End();
             base.Draw(gameTime);
         }
