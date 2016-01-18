@@ -33,7 +33,16 @@ namespace CasualGamesAssignment.GameObjects.Base
         }
 
         public virtual void Update(GameTime gameTime)
-        { }
+        {
+            if (Rotation>2*Math.PI)
+            {
+                Rotation -= 2 * (float)Math.PI;
+            }
+            if (Rotation > 0)
+            {
+                Rotation += 2 * (float)Math.PI;
+            }
+        }
 
         public void Move(Vector2 delta)
         {

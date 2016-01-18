@@ -18,15 +18,15 @@ namespace CasualGamesAssignment
         InputEngine input;
 
         PlayerShip player;
-        OpponentShip opponent;
+        List<OpponentShip> opponents;
 
-        List<GameObjects.Base.SimpleSprite> Missiles;
+        Texture2D background;
+        Rectangle gameField;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            Missiles = new List<GameObjects.Base.SimpleSprite>();
 
             graphics.PreferredBackBufferWidth = 1440;
             graphics.PreferredBackBufferHeight = 900;
@@ -43,7 +43,7 @@ namespace CasualGamesAssignment
         {
             // TODO: Add your initialization logic here
             input = new InputEngine(this);
-            Helper.Initialize(graphics,Missiles);
+            Helper.Initialize(graphics);
             base.Initialize();
         }
 
@@ -55,7 +55,11 @@ namespace CasualGamesAssignment
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             Texture2D playerSprite = Content.Load<Texture2D>("blueship1");
+            Texture2D enemySprite1 = Content.Load<Texture2D>("redship1");
+            Texture2D enemySprite2 = Content.Load<Texture2D>("blackship1");
+            Texture2D enemySprite3 = Content.Load<Texture2D>("orangeship1");
             Texture2D missileSprite = Content.Load<Texture2D>("missile");
+            background = Content.Load<Texture2D>("starfield");
             debugFont = Content.Load<SpriteFont>("debug");
 
             player = new GameObjects.PlayerShip(playerSprite, new Vector2(200, 200))
@@ -71,15 +75,29 @@ namespace CasualGamesAssignment
                     MissileImage = missileSprite
                 }
             };
-            
 
-            opponent = new OpponentShip(playerSprite, new Vector2(500, 200))
+            opponents = new List<OpponentShip>()
             {
-                RotateSpeed = 1,
-                Target = player
+                new OpponentShip(enemySprite1, new Vector2(200, 700))
+                {
+                    RotateSpeed = 1,
+                    Target = player
+                },
+                new OpponentShip(enemySprite2, new Vector2(500, 700))
+                {
+                    RotateSpeed = 1,
+                    Target = player
+                },
+                new OpponentShip(enemySprite3, new Vector2(1000, 800))
+                {
+                    RotateSpeed = 1,
+                    Target = player
+                }
             };
-            
+
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            gameField = new Rectangle(GraphicsDevice.Viewport.Width/2 - background.Width/2, GraphicsDevice.Viewport.Height/2 - background.Height/2, background.Width, background.Height);
 
             // TODO: use this.Content to load your game content here
         }
@@ -102,15 +120,14 @@ namespace CasualGamesAssignment
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            for (int i = 0; i<Missiles.Count; i++)
-            {
-                Missiles[i].Update(gameTime);
-            }
             player.Update(gameTime);
-            opponent.Update(gameTime);
+            foreach (var op in opponents)
+            {
+                op.Update(gameTime);
+            }
             // TODO: Add your update logic here
             input.Update(gameTime);
-            Helper.Update();
+            Helper.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -123,13 +140,13 @@ namespace CasualGamesAssignment
             GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
-            spriteBatch.Begin();
-            player.draw(spriteBatch,debugFont);
-            opponent.draw(spriteBatch, debugFont);
-            foreach (var m in Missiles)
+            spriteBatch.Begin(SpriteSortMode.Deferred);
+            spriteBatch.Draw(background, gameField, Color.White);
+            player.draw(spriteBatch,debugFont); foreach (var op in opponents)
             {
-                m.draw(spriteBatch,debugFont);
+                op.draw(spriteBatch,debugFont);
             }
+            Helper.Draw(spriteBatch, debugFont);
             spriteBatch.End();
             base.Draw(gameTime);
         }

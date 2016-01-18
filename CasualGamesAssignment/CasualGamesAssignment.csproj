@@ -45,6 +45,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="GameObjects\Missile.cs" />
     <Compile Include="GameObjects\OpponentShip.cs" />
+    <Compile Include="GameObjects\Particle.cs" />
     <Compile Include="GameObjects\PlayerShip.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="InputEngine.cs" />

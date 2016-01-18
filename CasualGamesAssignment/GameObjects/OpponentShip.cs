@@ -23,7 +23,7 @@ namespace CasualGamesAssignment.GameObjects
         public OpponentShip(Texture2D spriteImage, Vector2 startPosition):base(spriteImage,startPosition)
         {
             enginePower = 0;
-            delta = new Vector2(0, -1);
+            delta = new Vector2(1,0);
         }
 
         public override void Update(GameTime gameTime)
@@ -39,10 +39,10 @@ namespace CasualGamesAssignment.GameObjects
             else enginePower = 0;
 
 
-            delta = (Target.Position - Position);
+            delta = Vector2.Lerp(delta,(Target.Position - Position),0.2f);
             delta.Normalize();
 
-            Rotation = (float)(Math.Atan2(delta.Y, delta.X));
+            Rotation = (float)(Math.Atan2(delta.Y,delta.X));
 
             var currentSpeed = delta.Length();
             if (currentSpeed > MaxSpeed)

@@ -11,9 +11,10 @@ namespace CasualGamesAssignment.GameObjects
     {
         private float enginePower;
         public Vector2 delta;
-        private Vector2 force;
         private bool canFire;
         private float fireTimer;
+
+        private Vector2 normal;
 
         public ShipInfo Info { get; set; }
         
@@ -21,8 +22,9 @@ namespace CasualGamesAssignment.GameObjects
         public PlayerShip(Texture2D spriteImage,Vector2 startPosition):base(spriteImage,startPosition)
         {
             enginePower = 0;
-            delta = new Vector2(0,-1);
+            delta = new Vector2(1,0);
             canFire = true;
+            normal = delta;
         }
 
         public override void Update(GameTime gameTime)
@@ -33,13 +35,13 @@ namespace CasualGamesAssignment.GameObjects
             {
                 if (canFire)
                 {
-                    Helper.AddObject(new Missile(Info.MissileImage, Position, Rotation) { Speed=0.1f,LayerDepth=0f });
+                    Helper.AddObject(new Missile(Info.MissileImage, Position+(normal*Image.Width/2), Rotation) { Speed=10f,LayerDepth=0f },Helper.Missiles);
                     canFire = false;
                     fireTimer =0;
                 }
-                else fireTimer += gameTime.ElapsedGameTime.Milliseconds;
             }
 
+            fireTimer += gameTime.ElapsedGameTime.Milliseconds;
             if (fireTimer >= Info.FireDelay)
                 canFire = true;
 
@@ -62,9 +64,10 @@ namespace CasualGamesAssignment.GameObjects
             
 
             var rotate = Matrix.CreateRotationZ(Rotation);
-            force = Vector2.Transform(new Vector2(0,-1), rotate);
-            force *= enginePower;
+            normal = Vector2.Transform(new Vector2(1,0), rotate);
 
+            delta += normal*enginePower;
+            //clamp 
             var currentSpeed = delta.Length();
             if (currentSpeed > Info.MaxSpeed)
             {
@@ -74,11 +77,11 @@ namespace CasualGamesAssignment.GameObjects
             {
                 currentSpeed -= Info.Friction;
             }
-            else currentSpeed = 0;
+            else currentSpeed -= Math.Abs(currentSpeed);
             delta.Normalize();
+
             delta *= currentSpeed;
 
-            delta += force;
 
             Move(delta);
             //base.Update(gameTime);
@@ -87,7 +90,7 @@ namespace CasualGamesAssignment.GameObjects
         public override void draw(SpriteBatch sp, SpriteFont font)
         {
             sp.DrawString(font, "Player Position: " + Position.ToString(), Helper.NextLine(), Color.White);
-            sp.DrawString(font, "Player Rotation: " + Rotation.ToString(), Helper.NextLine(), Color.White);
+            sp.DrawString(font, "Player Rotation: " + (Rotation / Math.PI * 180), Helper.NextLine(), Color.White);
             base.draw(sp, font);
         }
     }

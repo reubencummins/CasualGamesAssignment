@@ -1,4 +1,5 @@
-﻿using CasualGamesAssignment.GameObjects.Base;
+﻿using CasualGamesAssignment.GameObjects;
+using CasualGamesAssignment.GameObjects.Base;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -12,7 +13,9 @@ namespace CasualGamesAssignment
     public static class Helper
     {
         private static Vector2 viewportSize;
-        private static List<SimpleSprite> objectPool;
+        public static List<SimpleSprite> Missiles;
+        public static List<SimpleSprite> Particles;
+        public static Texture2D ParticleImage { get; set; }
 
         private static Vector2 line = new Vector2(10, -10);
 
@@ -22,15 +25,24 @@ namespace CasualGamesAssignment
             return line;
         }
 
-        public static void Initialize(GraphicsDeviceManager graphics, List<SimpleSprite> ObjectPool)
+        public static void Initialize(GraphicsDeviceManager graphics)
         {
             viewportSize = new Vector2(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height);
-            objectPool = ObjectPool;
+            Missiles = new List<SimpleSprite>();
+            Particles = new List<SimpleSprite>();
         }
 
-        public static void Update()
+        public static void Update(GameTime gameTime)
         {
             line = new Vector2(10, 10);
+            for (int i = 0; i < Missiles.Count; i++)
+            {
+                Missiles[i].Update(gameTime);
+            }
+            for (int i = 0; i < Particles.Count; i++)
+            {
+                Particles[i].Update(gameTime);
+            }
         }
 
         public static Vector2 ScreenWrap(Vector2 position)
@@ -54,17 +66,35 @@ namespace CasualGamesAssignment
             return position;
         }
 
-        public static void AddObject(SimpleSprite newObject)
+        public static void AddObject(SimpleSprite newObject, List<SimpleSprite> list)
         {
-            objectPool.Add(newObject);
+            list.Add(newObject);
         }
 
-        public static void RemoveObject(SimpleSprite oldObject)
+        public static void RemoveObject(SimpleSprite oldObject, List<SimpleSprite> list)
         {
-            if (objectPool.Contains(oldObject))
+            if (list.Contains(oldObject))
             {
-                objectPool.Remove(oldObject);
+                list.Remove(oldObject);
             }
+        }
+
+        public static void Draw(SpriteBatch spriteBatch, SpriteFont font)
+        {
+
+            foreach (var m in Missiles)
+            {
+                m.draw(spriteBatch, font);
+            }
+            foreach (var p in Particles)
+            {
+                p.draw(spriteBatch, font);
+            }
+        }
+
+        public static void AddParticle(Vector2 position, Vector2 delta, Particle.ParticleType type)
+        {
+            AddObject(new Particle(ParticleImage, position, delta) { Type = type }, Particles);
         }
     }
 }
