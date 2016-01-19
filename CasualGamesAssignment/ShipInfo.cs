@@ -10,6 +10,7 @@ namespace CasualGamesAssignment
 {
     class ShipInfo
     {
+        public Guid ID;
         public float Acceleration { get; set; }
         public float RotateSpeed { get; set; }
         public float MaxSpeed { get; set; }
@@ -17,5 +18,10 @@ namespace CasualGamesAssignment
         public float Friction { get; set; }
         public Texture2D MissileImage { get; set; }
         public float FireDelay { get; set; }
+
+        public ShipInfo()
+        {
+            ID = new Guid();
+        }
     }
 }
