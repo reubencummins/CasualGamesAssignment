@@ -18,7 +18,7 @@ namespace CasualGamesAssignment
         InputEngine input;
 
         PlayerShip player;
-        List<OpponentShip> opponents;
+        List<AutoShip> opponents;
 
         Texture2D background;
         Rectangle gameField;
@@ -76,19 +76,19 @@ namespace CasualGamesAssignment
                 }
             };
 
-            opponents = new List<OpponentShip>()
+            opponents = new List<AutoShip>()
             {
-                new OpponentShip(enemySprite1, new Vector2(200, 700))
+                new AutoShip(enemySprite1, new Vector2(200, 700))
                 {
                     RotateSpeed = 1,
                     Target = player
                 },
-                new OpponentShip(enemySprite2, new Vector2(500, 700))
+                new AutoShip(enemySprite2, new Vector2(500, 700))
                 {
                     RotateSpeed = 1,
                     Target = player
                 },
-                new OpponentShip(enemySprite3, new Vector2(1000, 800))
+                new AutoShip(enemySprite3, new Vector2(1000, 800))
                 {
                     RotateSpeed = 1,
                     Target = player
