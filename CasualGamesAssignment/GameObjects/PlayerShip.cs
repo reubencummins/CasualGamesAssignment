@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CasualGamesAssignment.GameObjects
 {
-    class PlayerShip : Base.SimpleSprite
+    public class PlayerShip : Base.SimpleSprite
     {
         private float enginePower;
         public Vector2 delta;
@@ -24,7 +24,7 @@ namespace CasualGamesAssignment.GameObjects
         {
             enginePower = 0;
             delta = new Vector2(1,0);
-            canFire = true;
+            canFire = false;
             normal = delta;
             Info = info;
             Health = Info.MaxHealth;
@@ -103,16 +103,16 @@ namespace CasualGamesAssignment.GameObjects
 
             Move(delta);
 
-            if (sendUpdate)
-            {
-                Helper.UpdateMe(new ShipUpdate
-                    (
-                    Position,
-                    delta,
-                    Rotation,
-                    Info.ID,
-                    Health));
-            }
+            //if (sendUpdate)
+            //{
+            //    Helper.UpdateMe(new ShipUpdate
+            //        (
+            //        Position,
+            //        delta,
+            //        Rotation,
+            //        Info.ID,
+            //        Health));
+            //}
             base.Update(gameTime);
         }
 

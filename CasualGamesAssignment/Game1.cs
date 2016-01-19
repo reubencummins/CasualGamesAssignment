@@ -20,7 +20,7 @@ namespace CasualGamesAssignment
         InputEngine input;
 
         PlayerShip player;
-        List<OpponentShip> opponents;
+        List<AutoShip> opponents;
 
         Dictionary<string, Texture2D> sprites;
         
@@ -47,11 +47,11 @@ namespace CasualGamesAssignment
             Connection = new HubConnection("http://localhost:63288/");
             proxy = Connection.CreateHubProxy("GameHub");
 
-            Action<List<ShipInfo>> play = Play;
-            proxy.On("play", play);
+            //Action<List<ShipInfo>> play = Play;
+            //proxy.On("play", play);
 
-            Action<ShipUpdate> updateOpponent = UpdateOpponent;
-            proxy.On("updateOpponent", updateOpponent);
+            //Action<ShipUpdate> updateOpponent = UpdateOpponent;
+            //proxy.On("updateOpponent", updateOpponent);
 
             Action<ShipInfo> confirmJoin = ConfirmJoin;
             proxy.On("confirmJoin", confirmJoin);
@@ -82,6 +82,7 @@ namespace CasualGamesAssignment
             sprites.Add("ship2", Content.Load<Texture2D>("blackship1"));
             sprites.Add("ship3", Content.Load<Texture2D>("orangeship1"));
             sprites.Add("background", Content.Load<Texture2D>("starfield"));
+            sprites.Add("missile", Content.Load<Texture2D>("missile"));
             sprites.Add("noImage", Content.Load<Texture2D>("pixel"));
             debugFont = Content.Load<SpriteFont>("debug");
 
@@ -126,6 +127,14 @@ namespace CasualGamesAssignment
                             proxy.Invoke("join");
                         }
                         else Connection.Start();
+                        break;
+                    case "offlinePlay":
+                        player = new PlayerShip(sprites["ship0"], new Vector2(300, 600), new ShipInfo("", "ship0", new Vector2(300, 600)) { MissileImage=sprites["missile"]});
+                        opponents = new List<AutoShip>()
+                        {
+                            new AutoShip(sprites["ship1"],new Vector2(100,100)) { Target=player }
+                        };
+                        state = GAMESTATE.PLAYING;
                         break;
                     default:
                         break;
@@ -174,23 +183,23 @@ namespace CasualGamesAssignment
         }
 
 
-        private void UpdateOpponent(ShipUpdate opponent)
-        {
-            OpponentShip opp = Helper.Opponents.FirstOrDefault(op => op.Info.ID == opponent.ID);
-            lock(gameLock)
-            {
-                opp.UpdateMe(opponent);
-            }
-        }
+        //private void UpdateOpponent(ShipUpdate opponent)
+        //{
+        //    OpponentShip opp = Helper.Opponents.FirstOrDefault(op => op.Info.ID == opponent.ID);
+        //    lock(gameLock)
+        //    {
+        //        opp.UpdateMe(opponent);
+        //    }
+        //}
 
-        private void Play(List<ShipInfo> Opponents)
-        {
-            foreach (var item in Opponents)
-            {
-                opponents.Add(new OpponentShip(sprites[item.ShipImage],item.StartPosition));
-            }
-            state = GAMESTATE.PLAYING;
-        }
+        //private void Play(List<ShipInfo> Opponents)
+        //{
+        //    foreach (var item in Opponents)
+        //    {
+        //        opponents.Add(new OpponentShip(sprites[item.ShipImage],item.StartPosition));
+        //    }
+        //    state = GAMESTATE.PLAYING;
+        //}
 
     }
 }

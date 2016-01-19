@@ -32,6 +32,7 @@ namespace CasualGamesAssignment
             Items = new List<MenuItem>()
             {
                 new MenuItem() { Text="Join Game", Action="join"},
+                new MenuItem() { Text="Offline Practice", Action="offlinePlay" },
                 new MenuItem() { Text="Quit",Action="quit" }
             };
         }

@@ -14,7 +14,7 @@ namespace CasualGamesAssignment
     public static class Helper
     {
         private static Vector2 viewportSize;
-        public static List<OpponentShip> Opponents;
+        public static List<AutoShip> Opponents;
         public static List<SimpleSprite> Missiles;
         public static List<SimpleSprite> Particles;
         public static Texture2D ParticleImage { get; set; }
@@ -34,7 +34,7 @@ namespace CasualGamesAssignment
             viewportSize = new Vector2(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height);
             Missiles = new List<SimpleSprite>();
             Particles = new List<SimpleSprite>();
-            Opponents = new List<OpponentShip>();
+            Opponents = new List<AutoShip>();
             Proxy=proxy;
         }
 

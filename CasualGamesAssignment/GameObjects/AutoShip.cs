@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CasualGamesAssignment.GameObjects
 {
-    class AutoShip : Base.SimpleSprite
+    public class AutoShip : Base.SimpleSprite
     {
         private float enginePower;
         public Vector2 delta;
