@@ -18,10 +18,13 @@ namespace CasualGamesAssignment
         public float Friction { get; set; }
         public Texture2D MissileImage { get; set; }
         public float FireDelay { get; set; }
-
+        public string ConnectionID;
         public int MaxHealth { get; set; }
+        public string ShipImage { get; set; }
 
-        public ShipInfo()
+        public Vector2 StartPosition { get; set; }
+
+        public ShipInfo(string connectionID, string sprite, Vector2 position)
         {
             MaxSpeed = 5f;
             Acceleration = 0.1f;
@@ -31,6 +34,9 @@ namespace CasualGamesAssignment
             FireDelay = 500;
             MaxHealth = 5;
             ID = new Guid();
+            ConnectionID = connectionID;
+            StartPosition = position;
+            ShipImage = sprite;
         }
     }
 }
