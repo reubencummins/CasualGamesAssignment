@@ -11,7 +11,6 @@ namespace CasualGamesAssignment.GameObjects
     {
         private float enginePower;
         public Vector2 delta;
-        private Vector2 force;
 
         public float Acceleration { get; set; }
         public float RotateSpeed { get; set; }
@@ -28,19 +27,14 @@ namespace CasualGamesAssignment.GameObjects
 
         public override void Update(GameTime gameTime)
         {
-
-            if (/**/true)
-            {
-                if (enginePower <= MaxPower)
-                {
-                    enginePower += Acceleration;
-                }
-            }
-            else enginePower = 0;
+            
+            enginePower = 3;
 
 
-            delta = Vector2.Lerp(delta,(Target.Position - Position),0.2f);
+            delta = Target.Position - Position;
             delta.Normalize();
+
+            delta *= enginePower;
 
             Rotation = (float)(Math.Atan2(delta.Y,delta.X));
 
@@ -56,11 +50,16 @@ namespace CasualGamesAssignment.GameObjects
             else currentSpeed = 0;
             delta *= currentSpeed;
 
-            delta += force;
 
             Move(delta);
 
             base.Update(gameTime);
+        }
+
+        public override void draw(SpriteBatch sp, SpriteFont font)
+        {
+            sp.DrawString(font, delta.ToString(), Helper.NextLine(), Color.AliceBlue);
+            base.draw(sp, font);
         }
     }
 }

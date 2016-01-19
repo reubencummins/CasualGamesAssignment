@@ -8,17 +8,18 @@ using System.Threading.Tasks;
 
 namespace CasualGamesAssignment.GameObjects
 {
-    class Missile : Base.SimpleSprite
+    public class Missile : Base.SimpleSprite
     {
         Vector2 Delta;
-        float LifeTime = 200;
         float age = 0;
 
 
         public float Speed { get; set; }
+        public float LifeTime { get; set; }
 
         public Missile(Texture2D spriteImage, Vector2 startPostition,float angle):base(spriteImage,startPostition)
         {
+            LifeTime = 100;
             Speed = 5;
             var rotMatrix = Matrix.CreateRotationZ(angle);
             Delta = new Vector2(1,0);
@@ -36,7 +37,6 @@ namespace CasualGamesAssignment.GameObjects
                 Die();
             }
             
-            //collision checking
 
             base.Update(gameTime);
         }

@@ -13,6 +13,7 @@ namespace CasualGamesAssignment
     public static class Helper
     {
         private static Vector2 viewportSize;
+        public static List<SimpleSprite> Opponents;
         public static List<SimpleSprite> Missiles;
         public static List<SimpleSprite> Particles;
         public static Texture2D ParticleImage { get; set; }
@@ -30,6 +31,7 @@ namespace CasualGamesAssignment
             viewportSize = new Vector2(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height);
             Missiles = new List<SimpleSprite>();
             Particles = new List<SimpleSprite>();
+            Opponents = new List<SimpleSprite>();
         }
 
         public static void Update(GameTime gameTime)
@@ -38,10 +40,36 @@ namespace CasualGamesAssignment
             for (int i = 0; i < Missiles.Count; i++)
             {
                 Missiles[i].Update(gameTime);
+                try
+                {
+                    foreach (SimpleSprite ship in Opponents)
+                    {
+                        if (Math.Abs((Missiles[i].Position - ship.Position).Length()) < 50)
+                        {
+                            Missile mis = Missiles[i] as Missile;
+                            mis.Die();
+                            DamageShip(ship, 1);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                }
             }
             for (int i = 0; i < Particles.Count; i++)
             {
                 Particles[i].Update(gameTime);
+            }
+            
+        }
+
+        private static void DamageShip(SimpleSprite opponent, int amount)
+        {
+            if (opponent is OpponentShip)
+            {
+                OpponentShip opp = opponent as OpponentShip;
+                opp.health--; 
             }
         }
 
@@ -95,6 +123,11 @@ namespace CasualGamesAssignment
         public static void AddParticle(Vector2 position, Vector2 delta, Particle.ParticleType type)
         {
             AddObject(new Particle(ParticleImage, position, delta) { Type = type }, Particles);
+        }
+
+        public static void UpdateShip(ShipUpdate ship, Guid id)
+        {
+
         }
     }
 }

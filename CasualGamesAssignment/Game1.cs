@@ -1,8 +1,10 @@
 ﻿using CasualGamesAssignment.GameObjects;
 using CasualGamesAssignment.GameObjects.Base;
+using Microsoft.AspNet.SignalR.Client;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 namespace CasualGamesAssignment
@@ -18,19 +20,34 @@ namespace CasualGamesAssignment
         InputEngine input;
 
         PlayerShip player;
-        List<AutoShip> opponents;
+        List<SimpleSprite> opponents;
 
         Texture2D background;
         Rectangle gameField;
+
+        //HubConnection Connection;
+        //IHubProxy proxy;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            graphics.PreferredBackBufferWidth = 1440;
-            graphics.PreferredBackBufferHeight = 900;
-            graphics.ToggleFullScreen();
+            //graphics.PreferredBackBufferWidth = 1440;
+            //graphics.PreferredBackBufferHeight = 900;
+            //graphics.ToggleFullScreen();
+
+
+            //Connection = new HubConnection("http://localhost:53824/");
+            //proxy = Connection.CreateHubProxy("GameHub");
+
+            //Action<List<ShipInfo>> play = Play;
+            //proxy.On("play", play);
+        }
+
+        private void Play(List<ShipInfo> Players)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -62,9 +79,10 @@ namespace CasualGamesAssignment
             background = Content.Load<Texture2D>("starfield");
             debugFont = Content.Load<SpriteFont>("debug");
 
-            player = new GameObjects.PlayerShip(playerSprite, new Vector2(200, 200))
-            {
-                Info = new ShipInfo()
+            player = new GameObjects.PlayerShip(
+                playerSprite,
+                new Vector2(100, 100),
+                new ShipInfo()
                 {
                     MaxSpeed = 5f,
                     Acceleration = 0.1f,
@@ -73,31 +91,38 @@ namespace CasualGamesAssignment
                     MaxPower = 0.4f,
                     FireDelay = 500,
                     MissileImage = missileSprite
+                });
+
+            opponents = new List<SimpleSprite>()
+            {
+                new AutoShip(enemySprite1, new Vector2(200, 100))
+                {
+                    RotateSpeed = 1,
+                    Target = player
+                },
+                new AutoShip(enemySprite2, new Vector2(100, 400))
+                {
+                    RotateSpeed = 1,
+                    Target = player
+                },
+                new AutoShip(enemySprite3, new Vector2(200, 200))
+                {
+                    RotateSpeed = 1,
+                    Target = player
                 }
             };
 
-            opponents = new List<AutoShip>()
-            {
-                new AutoShip(enemySprite1, new Vector2(200, 700))
-                {
-                    RotateSpeed = 1,
-                    Target = player
-                },
-                new AutoShip(enemySprite2, new Vector2(500, 700))
-                {
-                    RotateSpeed = 1,
-                    Target = player
-                },
-                new AutoShip(enemySprite3, new Vector2(1000, 800))
-                {
-                    RotateSpeed = 1,
-                    Target = player
-                }
-            };
+            Helper.Opponents = opponents;
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            gameField = new Rectangle(GraphicsDevice.Viewport.Width/2 - background.Width/2, GraphicsDevice.Viewport.Height/2 - background.Height/2, background.Width, background.Height);
+            gameField = new Rectangle
+                (
+                    GraphicsDevice.Viewport.Width / 2 - background.Width / 2,
+                    GraphicsDevice.Viewport.Height / 2 - background.Height / 2,
+                    background.Width,
+                    background.Height
+                );
 
             // TODO: use this.Content to load your game content here
         }
