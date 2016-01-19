@@ -18,12 +18,7 @@ namespace CasualGamesAssignment.GameObjects
         }
 
         public void UpdateMe(ShipUpdate update)
-        {
-            delta = update.Delta;
-            Position = update.Position;
-            Rotation = update.Rotation;
-            health = update.Health;
-        }
+        { }
 
         public override void Update(GameTime gameTime)
         {

@@ -1,6 +1,5 @@
 ﻿using CasualGamesAssignment.GameObjects;
 using CasualGamesAssignment.GameObjects.Base;
-using Microsoft.AspNet.SignalR.Client;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -14,14 +13,12 @@ namespace CasualGamesAssignment
     public static class Helper
     {
         private static Vector2 viewportSize;
-        public static List<OpponentShip> Opponents;
+        public static List<SimpleSprite> Opponents;
         public static List<SimpleSprite> Missiles;
         public static List<SimpleSprite> Particles;
         public static Texture2D ParticleImage { get; set; }
 
         private static Vector2 line = new Vector2(10, -10);
-
-        static IHubProxy Proxy;
 
         public static Vector2 NextLine()
         {
@@ -29,13 +26,12 @@ namespace CasualGamesAssignment
             return line;
         }
 
-        public static void Initialize(GraphicsDeviceManager graphics, IHubProxy proxy)
+        public static void Initialize(GraphicsDeviceManager graphics)
         {
             viewportSize = new Vector2(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height);
             Missiles = new List<SimpleSprite>();
             Particles = new List<SimpleSprite>();
-            Opponents = new List<OpponentShip>();
-            Proxy=proxy;
+            Opponents = new List<SimpleSprite>();
         }
 
         public static void Update(GameTime gameTime)
@@ -57,7 +53,9 @@ namespace CasualGamesAssignment
                     }
                 }
                 catch (Exception)
-                { }
+                {
+                    
+                }
             }
             for (int i = 0; i < Particles.Count; i++)
             {
@@ -127,9 +125,9 @@ namespace CasualGamesAssignment
             AddObject(new Particle(ParticleImage, position, delta) { Type = type }, Particles);
         }
 
-        public static void UpdateMe(ShipUpdate ship)
+        public static void UpdateShip(ShipUpdate ship, Guid id)
         {
-            Proxy.Invoke("updateShip", ship);
+
         }
     }
 }

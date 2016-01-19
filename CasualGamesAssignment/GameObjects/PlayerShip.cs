@@ -105,15 +105,15 @@ namespace CasualGamesAssignment.GameObjects
 
             if (sendUpdate)
             {
-                Helper.UpdateMe(new ShipUpdate
+                Helper.UpdateShip(new ShipUpdate
                     (
                     Position,
                     delta,
-                    Rotation,
-                    Info.ID,
-                    Health));
+                    Rotation
+                    ),
+                    Info.ID);
             }
-            base.Update(gameTime);
+            //base.Update(gameTime);
         }
 
         public override void draw(SpriteBatch sp, SpriteFont font)

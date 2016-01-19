@@ -6,33 +6,27 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CasualGamesAssignment
 {
+    /// <summary>
+    /// This is the main type for your game.
+    /// </summary>
     public class Game1 : Game
     {
-        private static object gameLock = new object();
-
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         SpriteFont debugFont;
         InputEngine input;
 
         PlayerShip player;
-        List<OpponentShip> opponents;
+        List<SimpleSprite> opponents;
 
-        Dictionary<string, Texture2D> sprites;
-        
+        Texture2D background;
+        Rectangle gameField;
 
-        HubConnection Connection;
-        IHubProxy proxy;
-
-        MainMenu menu;
-
-        public enum GAMESTATE { STARTING, WAITING, PLAYING, ENDING }
-
-        public static GAMESTATE state;
+        //HubConnection Connection;
+        //IHubProxy proxy;
 
         public Game1()
         {
@@ -44,153 +38,142 @@ namespace CasualGamesAssignment
             //graphics.ToggleFullScreen();
 
 
-            Connection = new HubConnection("http://localhost:63288/");
-            proxy = Connection.CreateHubProxy("GameHub");
+            //Connection = new HubConnection("http://localhost:53824/");
+            //proxy = Connection.CreateHubProxy("GameHub");
 
-            Action<List<ShipInfo>> play = Play;
-            proxy.On("play", play);
-
-            Action<ShipUpdate> updateOpponent = UpdateOpponent;
-            proxy.On("updateOpponent", updateOpponent);
-
-            Action<ShipInfo> confirmJoin = ConfirmJoin;
-            proxy.On("confirmJoin", confirmJoin);
-
-            state = GAMESTATE.STARTING;
+            //Action<List<ShipInfo>> play = Play;
+            //proxy.On("play", play);
         }
 
-        private void ConfirmJoin(ShipInfo playerShip)
+        private void Play(List<ShipInfo> Players)
         {
-            player = new PlayerShip(sprites[playerShip.ShipImage], playerShip.StartPosition, playerShip);
-            state = GAMESTATE.WAITING;
+            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Allows the game to perform any initialization it needs to before starting to run.
+        /// This is where it can query for any required services and load any non-graphic
+        /// related content.  Calling base.Initialize will enumerate through any components
+        /// and initialize them as well.
+        /// </summary>
         protected override void Initialize()
         {
-           
+            // TODO: Add your initialization logic here
             input = new InputEngine(this);
-            Helper.Initialize(graphics,proxy);
+            Helper.Initialize(graphics);
             base.Initialize();
-            Connection.Start();
         }
-        
+
+        /// <summary>
+        /// LoadContent will be called once per game and is the place to load
+        /// all of your content.
+        /// </summary>
         protected override void LoadContent()
         {
-            sprites = new Dictionary<string, Texture2D>();
-            sprites.Add("ship0", Content.Load<Texture2D>("blueship1"));
-            sprites.Add("ship1", Content.Load<Texture2D>("redship1"));
-            sprites.Add("ship2", Content.Load<Texture2D>("blackship1"));
-            sprites.Add("ship3", Content.Load<Texture2D>("orangeship1"));
-            sprites.Add("background", Content.Load<Texture2D>("starfield"));
-            sprites.Add("noImage", Content.Load<Texture2D>("pixel"));
+            // Create a new SpriteBatch, which can be used to draw textures.
+            Texture2D playerSprite = Content.Load<Texture2D>("blueship1");
+            Texture2D enemySprite1 = Content.Load<Texture2D>("redship1");
+            Texture2D enemySprite2 = Content.Load<Texture2D>("blackship1");
+            Texture2D enemySprite3 = Content.Load<Texture2D>("orangeship1");
+            Texture2D missileSprite = Content.Load<Texture2D>("missile");
+            background = Content.Load<Texture2D>("starfield");
             debugFont = Content.Load<SpriteFont>("debug");
 
-            menu = new MainMenu(sprites["noImage"]);
+            player = new GameObjects.PlayerShip(
+                playerSprite,
+                new Vector2(100, 100),
+                new ShipInfo()
+                {
+                    MaxSpeed = 5f,
+                    Acceleration = 0.1f,
+                    RotateSpeed = 0.05f,
+                    Friction = 0.01f,
+                    MaxPower = 0.4f,
+                    FireDelay = 500,
+                    MissileImage = missileSprite
+                });
+
+            opponents = new List<SimpleSprite>()
+            {
+                new AutoShip(enemySprite1, new Vector2(200, 100))
+                {
+                    RotateSpeed = 1,
+                    Target = player
+                },
+                new AutoShip(enemySprite2, new Vector2(100, 400))
+                {
+                    RotateSpeed = 1,
+                    Target = player
+                },
+                new AutoShip(enemySprite3, new Vector2(200, 200))
+                {
+                    RotateSpeed = 1,
+                    Target = player
+                }
+            };
 
             Helper.Opponents = opponents;
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            gameField = new Rectangle
+                (
+                    GraphicsDevice.Viewport.Width / 2 - background.Width / 2,
+                    GraphicsDevice.Viewport.Height / 2 - background.Height / 2,
+                    background.Width,
+                    background.Height
+                );
+
+            // TODO: use this.Content to load your game content here
         }
-        
+
+        /// <summary>
+        /// UnloadContent will be called once per game and is the place to unload
+        /// game-specific content.
+        /// </summary>
         protected override void UnloadContent()
         {
+            // TODO: Unload any non ContentManager content here
         }
-        
+
+        /// <summary>
+        /// Allows the game to run logic such as updating the world,
+        /// checking for collisions, gathering input, and playing audio.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            if (state==GAMESTATE.PLAYING)       
+            player.Update(gameTime);
+            foreach (var op in opponents)
             {
-                //game
-                player.Update(gameTime);
-                foreach (var op in opponents)
-                {
-                    op.Update(gameTime);
-                }
+                op.Update(gameTime);
             }
-
-            if (state==GAMESTATE.STARTING)
-            {
-                //menu
-                menu.Update(gameTime);
-                switch (menu.MenuAction)
-                {
-                    case "quit":
-                        Exit();
-                        break;
-                    case "join":
-                        if (Connection.State == ConnectionState.Connected)
-                        {
-                            proxy.Invoke("join");
-                        }
-                        else Connection.Start();
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (state==GAMESTATE.WAITING)
-            {
-                //wait screen
-            }
-
-            Helper.Update(gameTime);
+            // TODO: Add your update logic here
             input.Update(gameTime);
-            base.Update(gameTime); 
+            Helper.Update(gameTime);
+            base.Update(gameTime);
         }
-        
+
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            
+
+            // TODO: Add your drawing code here
             spriteBatch.Begin(SpriteSortMode.Deferred);
-            if (state==GAMESTATE.PLAYING)
+            spriteBatch.Draw(background, gameField, Color.White);
+            player.draw(spriteBatch,debugFont); foreach (var op in opponents)
             {
-                spriteBatch.Draw(sprites["background"], new Rectangle(0,0,GraphicsDevice.Viewport.Width,GraphicsDevice.Viewport.Height), Color.White);
-                player.draw(spriteBatch, debugFont);
-                foreach (var op in opponents)
-                {
-                    op.draw(spriteBatch, debugFont);
-                }
-                Helper.Draw(spriteBatch, debugFont);
+                op.draw(spriteBatch,debugFont);
             }
-
-            if (state==GAMESTATE.STARTING)
-            {
-                menu.Draw(spriteBatch, debugFont);
-            }
-
-            if (state==GAMESTATE.WAITING)
-            {
-                Vector2 stringOffset = debugFont.MeasureString("Loading...");
-                spriteBatch.DrawString(debugFont, "Loading...", new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height) / 2 - stringOffset,Color.LimeGreen);
-            }
-            spriteBatch.DrawString(debugFont, Connection.State.ToString(), Helper.NextLine(), Color.Yellow);
+            Helper.Draw(spriteBatch, debugFont);
             spriteBatch.End();
             base.Draw(gameTime);
         }
-
-
-        private void UpdateOpponent(ShipUpdate opponent)
-        {
-            OpponentShip opp = Helper.Opponents.FirstOrDefault(op => op.Info.ID == opponent.ID);
-            lock(gameLock)
-            {
-                opp.UpdateMe(opponent);
-            }
-        }
-
-        private void Play(List<ShipInfo> Opponents)
-        {
-            foreach (var item in Opponents)
-            {
-                opponents.Add(new OpponentShip(sprites[item.ShipImage],item.StartPosition));
-            }
-            state = GAMESTATE.PLAYING;
-        }
-
     }
 }
