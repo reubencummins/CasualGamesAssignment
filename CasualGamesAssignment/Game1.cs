@@ -20,7 +20,8 @@ namespace CasualGamesAssignment
         InputEngine input;
 
         PlayerShip player;
-        List<AutoShip> opponents;
+        List<OpponentShip> opponents;
+        List<AutoShip> autos;
 
         Dictionary<string, Texture2D> sprites;
         
@@ -39,24 +40,32 @@ namespace CasualGamesAssignment
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            //graphics.PreferredBackBufferWidth = 1440;
-            //graphics.PreferredBackBufferHeight = 900;
-            //graphics.ToggleFullScreen();
+            graphics.PreferredBackBufferWidth = 1366;
+            graphics.PreferredBackBufferHeight = 768;
+            graphics.ToggleFullScreen();
 
 
-            Connection = new HubConnection("http://localhost:63288/");
+            Connection = new HubConnection("http://localhost:50416/");
             proxy = Connection.CreateHubProxy("GameHub");
 
-            //Action<List<ShipInfo>> play = Play;
-            //proxy.On("play", play);
+            Action<List<ShipInfo>> play = Play;
+            proxy.On("play", play);
+            
+            Action join = Join;
+            proxy.On("join", join);
 
-            //Action<ShipUpdate> updateOpponent = UpdateOpponent;
-            //proxy.On("updateOpponent", updateOpponent);
+            Action<ShipUpdate> updateOpponent = UpdateOpponent;
+            proxy.On("updateOpponent", updateOpponent);
 
             Action<ShipInfo> confirmJoin = ConfirmJoin;
             proxy.On("confirmJoin", confirmJoin);
 
             state = GAMESTATE.STARTING;
+        }
+
+        private void Join()
+        {
+            proxy.Invoke("join");
         }
 
         private void ConfirmJoin(ShipInfo playerShip)
@@ -84,7 +93,7 @@ namespace CasualGamesAssignment
             sprites.Add("background", Content.Load<Texture2D>("starfield"));
             sprites.Add("missile", Content.Load<Texture2D>("missile"));
             sprites.Add("noImage", Content.Load<Texture2D>("pixel"));
-            debugFont = Content.Load<SpriteFont>("debug");
+            debugFont = Content.Load<SpriteFont>("debugFont");
 
             menu = new MainMenu(sprites["noImage"]);
 
@@ -100,7 +109,11 @@ namespace CasualGamesAssignment
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            {
+                state = GAMESTATE.STARTING;
+                menu.MenuAction = "";
+                Connection.Stop();
+            }
 
             if (state==GAMESTATE.PLAYING)       
             {
@@ -109,6 +122,10 @@ namespace CasualGamesAssignment
                 foreach (var op in opponents)
                 {
                     op.Update(gameTime);
+                }
+                foreach (var auto in autos)
+                {
+                    auto.Update(gameTime);
                 }
             }
 
@@ -122,17 +139,21 @@ namespace CasualGamesAssignment
                         Exit();
                         break;
                     case "join":
+                        Console.WriteLine("");
                         if (Connection.State == ConnectionState.Connected)
                         {
                             proxy.Invoke("join");
                         }
                         else Connection.Start();
                         break;
+
                     case "offlinePlay":
-                        player = new PlayerShip(sprites["ship0"], new Vector2(300, 600), new ShipInfo("", "ship0", new Vector2(300, 600)) { MissileImage=sprites["missile"]});
-                        opponents = new List<AutoShip>()
+                        player = new PlayerShip(sprites["ship0"], new Vector2(300, 600), new ShipInfo("", "ship0", new Vector2(300, 600)) { MissileImage = sprites["missile"] });
+                        autos = new List<AutoShip>()
                         {
-                            new AutoShip(sprites["ship1"],new Vector2(100,100)) { Target=player }
+                            new AutoShip(sprites["ship1"],new Vector2(800,500)) { Target=player },
+                            new AutoShip(sprites["ship2"],new Vector2(1000,200)) { Target=player },
+                            new AutoShip(sprites["ship3"],new Vector2(200,600)) { Target=player }
                         };
                         state = GAMESTATE.PLAYING;
                         break;
@@ -164,6 +185,10 @@ namespace CasualGamesAssignment
                 {
                     op.draw(spriteBatch, debugFont);
                 }
+                foreach (var auto in autos)
+                {
+                    auto.draw(spriteBatch, debugFont);
+                }
                 Helper.Draw(spriteBatch, debugFont);
             }
 
@@ -183,23 +208,23 @@ namespace CasualGamesAssignment
         }
 
 
-        //private void UpdateOpponent(ShipUpdate opponent)
-        //{
-        //    OpponentShip opp = Helper.Opponents.FirstOrDefault(op => op.Info.ID == opponent.ID);
-        //    lock(gameLock)
-        //    {
-        //        opp.UpdateMe(opponent);
-        //    }
-        //}
+        private void UpdateOpponent(ShipUpdate opponent)
+        {
+            OpponentShip opp = Helper.Opponents.FirstOrDefault(op => op.Info.ID == opponent.ID);
+            lock (gameLock)
+            {
+                opp.UpdateMe(opponent);
+            }
+        }
 
-        //private void Play(List<ShipInfo> Opponents)
-        //{
-        //    foreach (var item in Opponents)
-        //    {
-        //        opponents.Add(new OpponentShip(sprites[item.ShipImage],item.StartPosition));
-        //    }
-        //    state = GAMESTATE.PLAYING;
-        //}
+        private void Play(List<ShipInfo> Opponents)
+        {
+            foreach (var item in Opponents)
+            {
+                opponents.Add(new OpponentShip(sprites[item.ShipImage], item.StartPosition));
+            }
+            state = GAMESTATE.PLAYING;
+        }
 
     }
 }
