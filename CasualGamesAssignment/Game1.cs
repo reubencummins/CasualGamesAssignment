@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static CasualGamesAssignment.Helper;
 
 namespace CasualGamesAssignment
 {
@@ -18,6 +19,8 @@ namespace CasualGamesAssignment
         SpriteBatch spriteBatch;
         SpriteFont debugFont;
         InputEngine input;
+
+        CTInput.Input _eventDrivenInput;
 
         PlayerShip player;
         List<OpponentShip> opponents;
@@ -31,18 +34,16 @@ namespace CasualGamesAssignment
 
         MainMenu menu;
 
-        public enum GAMESTATE { STARTING, WAITING, PLAYING, ENDING }
-
-        public static GAMESTATE state;
+        
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            graphics.PreferredBackBufferWidth = 1366;
-            graphics.PreferredBackBufferHeight = 768;
-            graphics.ToggleFullScreen();
+            //graphics.PreferredBackBufferWidth = 1366;
+            //graphics.PreferredBackBufferHeight = 768;
+            //graphics.ToggleFullScreen();
 
 
             Connection = new HubConnection("http://localhost:50416/");
@@ -76,9 +77,9 @@ namespace CasualGamesAssignment
 
         protected override void Initialize()
         {
-           
+            _eventDrivenInput = new CTInput.MonoGameInput(this);
             input = new InputEngine(this);
-            Helper.Initialize(graphics,proxy);
+            Helper.Initialize(graphics,proxy,_eventDrivenInput);
             base.Initialize();
             Connection.Start();
         }
@@ -111,7 +112,6 @@ namespace CasualGamesAssignment
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 state = GAMESTATE.STARTING;
-                menu.MenuAction = "";
                 Connection.Stop();
             }
 
@@ -142,7 +142,7 @@ namespace CasualGamesAssignment
                         Console.WriteLine("");
                         if (Connection.State == ConnectionState.Connected)
                         {
-                            proxy.Invoke("join");
+                            proxy.Invoke("join" /*object to hold login details*/);
                         }
                         else Connection.Start();
                         break;

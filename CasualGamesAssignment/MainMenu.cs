@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTInput;
 
 namespace CasualGamesAssignment
 {
@@ -16,13 +17,21 @@ namespace CasualGamesAssignment
         public string Action { get; set; }
     }
     
+    public class TextBox : MenuItem
+    {
+        public int MaxLength { get; set; }
+        public bool Hidden { get; set; }
+        public bool Edited = false;
+    }
 
     public class MainMenu
     {
         public List<MenuItem> Items;
         public int Selected = 1;
+        public MenuItem SelectedItem;
         Texture2D BoxBackground;
         public string MenuAction = "";
+        
 
         bool canSelect = true;
 
@@ -34,6 +43,7 @@ namespace CasualGamesAssignment
                 new MenuItem() { Text="Join Game", Action="join"},
                 new MenuItem() { Text="Offline Practice", Action="offlinePlay" },
                 new MenuItem() { Text="Quit",Action="quit" }
+                new TextBox() {Text="Username", MaxLength=15 }
             };
         }
 
@@ -79,12 +89,33 @@ namespace CasualGamesAssignment
                 }
             }
 
+            SelectedItem = Items[Selected];
+
             if (InputEngine.IsKeyHeld(Microsoft.Xna.Framework.Input.Keys.Space))
             {
-                MenuAction = Items[Selected].Action;
+                if (SelectedItem is TextBox)
+                {
+                    TextBox activeBox = SelectedItem as TextBox;
+                    Helper.Input.CharacterTyped += Input_CharacterTyped;
+                }
+                else
+                {
+                    Helper.Input.CharacterTyped -= Input_CharacterTyped;
+                    MenuAction = SelectedItem.Action;
+                }
             }
 
             
+        }
+
+        private void Input_CharacterTyped(object sender, Microsoft.Xna.Framework.Input.KeyboardCharacterEventArgs e)
+        {
+            var box = SelectedItem as TextBox;
+            if (!box.Edited)
+            {
+                box.Text = "";
+            }
+            box.Text += e.Character;
         }
 
         public void Draw(SpriteBatch spriteBatch, SpriteFont font)

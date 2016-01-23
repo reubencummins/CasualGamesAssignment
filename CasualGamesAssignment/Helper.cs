@@ -18,6 +18,11 @@ namespace CasualGamesAssignment
         public static List<SimpleSprite> Missiles;
         public static List<SimpleSprite> Particles;
         public static Texture2D ParticleImage { get; set; }
+        public static Game1 Game;
+        public static CTInput.Input Input;
+        public enum GAMESTATE { STARTING, WAITING, PLAYING, ENDING }
+
+        public static GAMESTATE state;
 
         private static Vector2 line = new Vector2(10, -10);
 
@@ -29,13 +34,14 @@ namespace CasualGamesAssignment
             return line;
         }
 
-        public static void Initialize(GraphicsDeviceManager graphics, IHubProxy proxy)
+        public static void Initialize(GraphicsDeviceManager graphics, IHubProxy proxy, CTInput.Input input)
         {
             viewportSize = new Vector2(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height);
             Missiles = new List<SimpleSprite>();
             Particles = new List<SimpleSprite>();
             Opponents = new List<OpponentShip>();
             Proxy=proxy;
+            Input = input;
         }
 
         public static void Update(GameTime gameTime)
@@ -63,7 +69,7 @@ namespace CasualGamesAssignment
             {
                 Particles[i].Update(gameTime);
             }
-            
+            Input.Update(gameTime);
         }
 
         private static void DamageShip(SimpleSprite opponent, int amount)
