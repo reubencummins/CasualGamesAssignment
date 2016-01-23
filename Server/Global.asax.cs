@@ -19,7 +19,7 @@ namespace Server
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            Database.SetInitializer(new Models.SeedScoreTable());
+            Database.SetInitializer(new Models.SeedHighScores());
         }
     }
 }

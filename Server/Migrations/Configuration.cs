@@ -1,90 +1,42 @@
-﻿using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Identity.Owin;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.ComponentModel.DataAnnotations;
-
-namespace Server.Models
+namespace Server.Migrations
 {
-    // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
-    public class ApplicationUser : IdentityUser
-    {
-        public List<HighScore> HighScores { get; set; }
-        public List<PlayerAchievement> UnlockedAchievemets { get; set; }
+    using Microsoft.AspNet.Identity;
+    using Models;
+    using System;
+    using System.Collections.Generic;
+    using System.Data.Entity;
+    using System.Data.Entity.Migrations;
+    using System.Linq;
 
-        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
+    internal sealed class Configuration : DbMigrationsConfiguration<Server.Models.ApplicationDbContext>
+    {
+        public Configuration()
         {
-            // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await manager.CreateIdentityAsync(this, authenticationType);
-            // Add custom user claims here
-            return userIdentity;
+            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationDataLossAllowed = true;
         }
-    }
-
-    public class HighScore
-    {
-        [Key]
-        public int ID { get; set; }
-        [Required]
-        public ApplicationUser User { get; set; }
-        [Required]
-        public int Score { get; set; }
-    }
-
-
-    public class Achievement
-    {
-        [Key]
-        public int ID { get; set; }
-        [Required, StringLength(16)]
-        public string Name { get; set; }
-        [Required, Display(Name="Name")]
-        public string DisplayName { get; set; }
-        [Required]
-        public string ImageURL { get; set; }
-        [Required]
-        public string LockedDescription { get; set; }
-        [Required]
-        public string UnlockedDescription { get; set; }
-    }
-
-
-    public class PlayerAchievement
-    {
-        [Key]
-        public int ID { get; set; }
-        [Required]
-        public ApplicationUser Player { get; set; }
-        [Required]
-        public Achievement Achievement { get; set; }
-    }
-    
-
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
-    {
-        
-        public DbSet<HighScore> Scores { get; set; }
-        public DbSet<Achievement> Achievements { get; set; }
-
-        public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+        int i = -1;
+        private int NextEmail()
         {
+            i++;
+            return i;
         }
-        
-        public static ApplicationDbContext Create()
-        {
-            return new ApplicationDbContext();
-        }
-        
-    }
 
-    public class SeedHighScores : DropCreateDatabaseAlways<ApplicationDbContext>
-    {
-        public override void InitializeDatabase(ApplicationDbContext context)
+        protected override void Seed(Server.Models.ApplicationDbContext context)
         {
+            //  This method will be called after migrating to the latest version.
+
+            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
+            //  to avoid creating duplicate seed data. E.g.
+            //
+            //    context.People.AddOrUpdate(
+            //      p => p.FullName,
+            //      new Person { FullName = "Andrew Peters" },
+            //      new Person { FullName = "Brice Lambson" },
+            //      new Person { FullName = "Rowan Miller" }
+            //    );
+            //
+
             List<Achievement> achievements = new List<Achievement>()
             {
                 new Achievement()
@@ -126,11 +78,12 @@ namespace Server.Models
                 context.Achievements.Add(ach);
             }
 
+            PasswordHasher hasher = new PasswordHasher();
             List<ApplicationUser> users = new List<ApplicationUser>()
             {
                 new ApplicationUser()
                 {
-                    Email = "noreply@nowhe.re",
+                    Email = NextEmail() + "@web.com",
                     UserName= "King_Kobra",
                     HighScores = new List<HighScore>()
                     {
@@ -140,7 +93,7 @@ namespace Server.Models
                 },
                 new ApplicationUser()
                 {
-                    Email = "anyone@someone.com",
+                    Email = NextEmail() + "@web.com",
                     UserName= "WaltzingMatilda",
                     HighScores = new List<HighScore>()
                     {
@@ -151,7 +104,7 @@ namespace Server.Models
                 },
                 new ApplicationUser()
                 {
-                    Email = "not@someone.com",
+                    Email = NextEmail() + "@web.com",
                     UserName= "IsildursBane",
                     HighScores = new List<HighScore>()
                     {
@@ -162,7 +115,7 @@ namespace Server.Models
                 },
                 new ApplicationUser()
                 {
-                    Email = "moop@tires.com",
+                    Email = NextEmail() + "@web.com",
                     UserName= "MoopBrigade",
                     HighScores = new List<HighScore>()
                     {
@@ -175,14 +128,14 @@ namespace Server.Models
             };
             foreach (var us in users)
             {
+                us.PasswordHash = hasher.HashPassword("password");
                 context.Users.Add(us);
                 foreach (var sc in us.HighScores)
                 {
                     context.Scores.Add(sc);
                 }
             }
-
-            base.InitializeDatabase(context);
+            context.SaveChanges();
         }
     }
 }
