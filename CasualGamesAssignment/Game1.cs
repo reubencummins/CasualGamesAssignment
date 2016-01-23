@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using CTInput;
 
 namespace CasualGamesAssignment
 {
@@ -18,7 +19,7 @@ namespace CasualGamesAssignment
         SpriteBatch spriteBatch;
         SpriteFont debugFont;
         InputEngine input;
-
+        
         PlayerShip player;
         List<SimpleSprite> opponents;
 
