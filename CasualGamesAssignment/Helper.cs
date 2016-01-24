@@ -63,6 +63,7 @@ namespace CasualGamesAssignment
                         mis.Die();
                         DamagePlayer(1);
                     }
+
                     foreach (SimpleSprite ship in Opponents)
                     {
                         if (Math.Abs((Missiles[i].Position - ship.Position).Length()) < 50)

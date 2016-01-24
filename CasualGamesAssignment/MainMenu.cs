@@ -35,10 +35,19 @@ namespace CasualGamesAssignment
 
         public override void Draw(SpriteBatch spriteBatch, SpriteFont font)
         {
+            string hidePass = "";
+            for (int i = 0; i < Text.Length; i++)
+            {
+                hidePass += "*";
+            }
+
             Vector2 stringOffset = font.MeasureString(Text) / 2;
 
             spriteBatch.Draw(Menu.BoxBackground, Box, Color.White);
-            spriteBatch.DrawString(font, Text, Box.Center.ToVector2() - stringOffset, Color);
+            if (!Hidden)
+                spriteBatch.DrawString(font, Title + ": " + Text, Box.Center.ToVector2() - stringOffset, Color); 
+            else
+                spriteBatch.DrawString(font, Title + ": " + hidePass, Box.Center.ToVector2() - stringOffset, Color);
         }
     }
 
@@ -63,9 +72,13 @@ namespace CasualGamesAssignment
                 new MenuItem() { Text="Join Game", Action="join"},
                 new MenuItem() { Text="Offline Practice", Action="offlinePlay" },
                 new MenuItem() { Text="Quit",Action="quit" },
-                new TextBox() {Text="Username", MaxLength=15 },
-                new TextBox() {Text="Password", MaxLength=15, Hidden=true }
+                new TextBox() { Title="Username", Text = "...", MaxLength=15 },
+                new TextBox() { Title="Password", Text = "...", MaxLength=15, Hidden=true }
             };
+            foreach (var item in Items)
+            {
+                item.Menu = this;
+            }
         }
 
         public void Update(GameTime gameTime)
@@ -112,11 +125,16 @@ namespace CasualGamesAssignment
 
             SelectedItem = Items[Selected];
 
-            if (InputEngine.IsKeyHeld(Microsoft.Xna.Framework.Input.Keys.Space))
+            if (InputEngine.IsKeyHeld(Microsoft.Xna.Framework.Input.Keys.Enter))
             {
                 if (SelectedItem is TextBox)
                 {
                     TextBox activeBox = SelectedItem as TextBox;
+                    if (!activeBox.Edited)
+                    {
+                        activeBox.Text = "";
+                    }
+                    activeBox.Edited = true;
                     Helper.Input.CharacterTyped += Input_CharacterTyped;
                 }
                 else
@@ -132,19 +150,34 @@ namespace CasualGamesAssignment
         private void Input_CharacterTyped(object sender, Microsoft.Xna.Framework.Input.KeyboardCharacterEventArgs e)
         {
             var box = SelectedItem as TextBox;
-            if (!box.Edited)
+            
+            if (canSelect)
             {
-                box.Text = "";
+                if (e.Character == '\b')
+                {
+                    box.Text.Remove(box.Text.Length-1);
+                }
+                else
+                {
+                    try
+                    {
+                        box.Text += e.Character;
+                    }
+                    catch (Exception)
+                    {
+
+                        throw;
+                    }
+                } 
             }
-            box.Edited = true;
-            box.Text += e.Character;
+            canSelect = false;
         }
 
         public void Draw(SpriteBatch spriteBatch, SpriteFont font)
         {
             foreach (MenuItem item in Items)
             {
-                
+                item.Draw(spriteBatch, font);
             }
         }
     }

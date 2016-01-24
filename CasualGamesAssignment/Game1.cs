@@ -40,9 +40,8 @@ namespace CasualGamesAssignment
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            //graphics.PreferredBackBufferWidth = 1366;
-            //graphics.PreferredBackBufferHeight = 768;
-            //graphics.ToggleFullScreen();
+            graphics.PreferredBackBufferWidth = 1366;
+            graphics.PreferredBackBufferHeight = 768;
 
 
             Connection = new HubConnection("http://localhost:50416/");
@@ -70,12 +69,14 @@ namespace CasualGamesAssignment
 
         private void ConfirmJoin(ShipInfo playerShip)
         {
-            player = new PlayerShip(sprites[playerShip.ShipImage], playerShip.StartPosition, playerShip);
+            player = new PlayerShip(sprites[playerShip.ShipImage], playerShip.StartPosition, playerShip) { Health = 5};
             state = GAMESTATE.WAITING;
         }
 
         protected override void Initialize()
         {
+            opponents = new List<OpponentShip>();
+            autos = new List<AutoShip>();
             _eventDrivenInput = new CTInput.MonoGameInput(this);
             input = new InputEngine(this);
             Helper.Initialize(graphics,proxy,_eventDrivenInput);

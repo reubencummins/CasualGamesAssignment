@@ -128,17 +128,17 @@ namespace CasualGamesAssignment.GameObjects
 
         public override void draw(SpriteBatch sp, SpriteFont font)
         {
-            sp.DrawString(
-                font,
-                "Player Position: " + Position.ToString(),
-                Helper.NextLine(),
-                Color.White
-                );
-            sp.DrawString(
-                font,
-                "Player Rotation: " + (Rotation / Math.PI * 180),
-                Helper.NextLine(),
-                Color.White);
+            //sp.DrawString(
+            //    font,
+            //    "Player Position: " + Position.ToString(),
+            //    Helper.NextLine(),
+            //    Color.White
+            //    );
+            //sp.DrawString(
+            //    font,
+            //    "Player Rotation: " + (Rotation / Math.PI * 180),
+            //    Helper.NextLine(),
+            //    Color.White);
 
             for (int i = 0; i < Health; i++)
             {
