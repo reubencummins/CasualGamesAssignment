@@ -33,7 +33,6 @@ namespace CasualGamesAssignment
         IHubProxy proxy;
 
         MainMenu menu;
-
         
 
         public Game1()
@@ -80,6 +79,7 @@ namespace CasualGamesAssignment
             _eventDrivenInput = new CTInput.MonoGameInput(this);
             input = new InputEngine(this);
             Helper.Initialize(graphics,proxy,_eventDrivenInput);
+            Helper.Player = player;
             base.Initialize();
             Connection.Start();
         }
@@ -142,7 +142,8 @@ namespace CasualGamesAssignment
                         Console.WriteLine("");
                         if (Connection.State == ConnectionState.Connected)
                         {
-                            proxy.Invoke("join" /*object to hold login details*/);
+                            PlayerAuthentication.Login(menu.Username, menu.Password);
+
                         }
                         else Connection.Start();
                         break;
@@ -159,6 +160,11 @@ namespace CasualGamesAssignment
                         break;
                     default:
                         break;
+                }
+
+                if (PlayerAuthentication.PlayerStatus==AUTHSTATUS.OK)
+                {
+                    proxy.Invoke("join");
                 }
             }
 

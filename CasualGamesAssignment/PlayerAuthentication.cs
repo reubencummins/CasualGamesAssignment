@@ -8,7 +8,7 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebAPIAuthenticationClient
+namespace CasualGamesAssignment
 {
     public enum AUTHSTATUS { NONE,OK,INVALID,FAILED }
 
@@ -36,7 +36,7 @@ namespace WebAPIAuthenticationClient
                 {
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    var response = client.GetAsync(baseWebAddress + "api/GameScores/getTops/Count/" + count.ToString() + "/Game/" + Game + "/").Result;
+                    var response = client.GetAsync(baseWebAddress + "api/HighScores/" + count.ToString() + "/").Result;
                     var resultContent = response.Content.ReadAsAsync<List<GameScoreObject>>(
                         new[] { new JsonMediaTypeFormatter() }).Result;
                     return resultContent;
@@ -89,8 +89,5 @@ namespace WebAPIAuthenticationClient
 
             }
         }
-
-        
-
-}
+    }
 }

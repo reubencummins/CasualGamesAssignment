@@ -113,7 +113,17 @@ namespace CasualGamesAssignment.GameObjects
             //        Info.ID,
             //        Health));
             //}
+
+            if (Health<=0)
+            {
+                Die();
+            }
             base.Update(gameTime);
+        }
+
+        private void Die()
+        {
+            Helper.SubmitScore();
         }
 
         public override void draw(SpriteBatch sp, SpriteFont font)

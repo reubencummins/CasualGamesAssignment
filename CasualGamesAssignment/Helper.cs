@@ -17,7 +17,12 @@ namespace CasualGamesAssignment
         public static List<OpponentShip> Opponents;
         public static List<SimpleSprite> Missiles;
         public static List<SimpleSprite> Particles;
+
+        public static PlayerShip Player;
+        public static int Score;
+
         public static Texture2D ParticleImage { get; set; }
+
         public static Game1 Game;
         public static CTInput.Input Input;
         public enum GAMESTATE { STARTING, WAITING, PLAYING, ENDING }
@@ -52,6 +57,12 @@ namespace CasualGamesAssignment
                 Missiles[i].Update(gameTime);
                 try
                 {
+                    if (Math.Abs((Missiles[i].Position - Player.Position).Length()) < 50)
+                    {
+                        Missile mis = Missiles[i] as Missile;
+                        mis.Die();
+                        DamagePlayer(1);
+                    }
                     foreach (SimpleSprite ship in Opponents)
                     {
                         if (Math.Abs((Missiles[i].Position - ship.Position).Length()) < 50)
@@ -59,6 +70,7 @@ namespace CasualGamesAssignment
                             Missile mis = Missiles[i] as Missile;
                             mis.Die();
                             DamageShip(ship, 1);
+                            Score++;
                         }
                     }
                 }
@@ -72,12 +84,17 @@ namespace CasualGamesAssignment
             Input.Update(gameTime);
         }
 
+        private static void DamagePlayer(int amount)
+        {
+            Player.Health -= amount;
+        }
+
         private static void DamageShip(SimpleSprite opponent, int amount)
         {
             if (opponent is OpponentShip)
             {
                 OpponentShip opp = opponent as OpponentShip;
-                opp.health--; 
+                opp.health-=amount; 
             }
         }
 
@@ -136,6 +153,12 @@ namespace CasualGamesAssignment
         public static void UpdateMe(ShipUpdate ship)
         {
             Proxy.Invoke("updateShip", ship);
+        }
+
+
+        public static void SubmitScore()
+        {
+            GameScoreObject finalScore = new GameScoreObject() { PlayerID = Player.Info.ID.ToString(), Score = Score };
         }
     }
 }

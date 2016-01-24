@@ -11,17 +11,35 @@ namespace CasualGamesAssignment
 {
     public class MenuItem
     {
+        public MainMenu Menu { get; set; }
         public string Text { get; set; }
         public Rectangle Box;
         public Color Color = Color.Black;
         public string Action { get; set; }
+
+        public virtual void Draw(SpriteBatch spriteBatch, SpriteFont font)
+        {
+            Vector2 stringOffset = font.MeasureString(Text) / 2;
+
+            spriteBatch.Draw(Menu.BoxBackground, Box, Color.White);
+            spriteBatch.DrawString(font, Text, Box.Center.ToVector2() - stringOffset, Color);
+        }
     }
     
     public class TextBox : MenuItem
     {
+        public string Title { get; set; }
         public int MaxLength { get; set; }
         public bool Hidden { get; set; }
         public bool Edited = false;
+
+        public override void Draw(SpriteBatch spriteBatch, SpriteFont font)
+        {
+            Vector2 stringOffset = font.MeasureString(Text) / 2;
+
+            spriteBatch.Draw(Menu.BoxBackground, Box, Color.White);
+            spriteBatch.DrawString(font, Text, Box.Center.ToVector2() - stringOffset, Color);
+        }
     }
 
     public class MainMenu
@@ -29,8 +47,10 @@ namespace CasualGamesAssignment
         public List<MenuItem> Items;
         public int Selected = 1;
         public MenuItem SelectedItem;
-        Texture2D BoxBackground;
+        public Texture2D BoxBackground;
         public string MenuAction = "";
+
+        public string Username, Password;
         
 
         bool canSelect = true;
@@ -42,8 +62,9 @@ namespace CasualGamesAssignment
             {
                 new MenuItem() { Text="Join Game", Action="join"},
                 new MenuItem() { Text="Offline Practice", Action="offlinePlay" },
-                new MenuItem() { Text="Quit",Action="quit" }
-                new TextBox() {Text="Username", MaxLength=15 }
+                new MenuItem() { Text="Quit",Action="quit" },
+                new TextBox() {Text="Username", MaxLength=15 },
+                new TextBox() {Text="Password", MaxLength=15, Hidden=true }
             };
         }
 
@@ -115,6 +136,7 @@ namespace CasualGamesAssignment
             {
                 box.Text = "";
             }
+            box.Edited = true;
             box.Text += e.Character;
         }
 
@@ -122,11 +144,7 @@ namespace CasualGamesAssignment
         {
             foreach (MenuItem item in Items)
             {
-                Vector2 stringOffset = font.MeasureString(item.Text)/2;
-
-                spriteBatch.Draw(BoxBackground, item.Box, Color.White);
-                spriteBatch.DrawString(font, item.Text, item.Box.Center.ToVector2()-stringOffset, item.Color);
-                spriteBatch.DrawString(font, MenuAction, new Vector2(200, 200), Color.Red);
+                
             }
         }
     }
